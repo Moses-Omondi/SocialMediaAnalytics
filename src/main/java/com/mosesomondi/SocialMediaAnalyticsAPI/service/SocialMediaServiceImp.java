@@ -1,6 +1,8 @@
 package com.mosesomondi.SocialMediaAnalyticsAPI.service;
 
 import com.mosesomondi.SocialMediaAnalyticsAPI.dto.UserDTO;
+import com.mosesomondi.SocialMediaAnalyticsAPI.exception.UserAlreadyExistsException;
+import com.mosesomondi.SocialMediaAnalyticsAPI.exception.UserNotFoundException;
 import com.mosesomondi.SocialMediaAnalyticsAPI.model.User;
 import com.mosesomondi.SocialMediaAnalyticsAPI.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,6 +20,15 @@ public class SocialMediaServiceImp implements SocialMediaService {
 
     @Override
     public UserDTO saveUser(UserDTO userDTO) {
+
+        if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
+            throw new UserAlreadyExistsException("User with email " + userDTO.getEmail() + " already exists.");
+        }
+
+        if(userRepository.findByUsername(userDTO.getUsername()).isPresent()) {
+            throw new UserAlreadyExistsException("User with username " + userDTO.getUsername() + " already exists.");
+        }
+
          User user = new User();
          user.setUsername(userDTO.getUsername());
          user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
@@ -34,7 +45,9 @@ public class SocialMediaServiceImp implements SocialMediaService {
 
     @Override
     public UserDTO findUserById(Long userId) {
-        User savedUser = userRepository.findById(userId).orElseThrow();
+        User savedUser = userRepository.findById(userId).orElseThrow(
+                () -> new UserNotFoundException("User with ID " + userId + " not found.")
+        );
 
         UserDTO savedUserDTO = new UserDTO();
 
