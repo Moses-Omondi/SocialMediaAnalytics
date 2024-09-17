@@ -2,7 +2,6 @@ package com.mosesomondi.SocialMediaAnalyticsAPI.controller;
 
 import com.mosesomondi.SocialMediaAnalyticsAPI.dto.UserDTO;
 import com.mosesomondi.SocialMediaAnalyticsAPI.service.SocialMediaServiceImp;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,8 +10,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/users")
 public class AuthController {
 
-    @Autowired
-    private SocialMediaServiceImp socialMediaService;
+    private final SocialMediaServiceImp socialMediaService;
+
+    public AuthController(SocialMediaServiceImp socialMediaService) {
+        this.socialMediaService = socialMediaService;
+    }
 
     @PostMapping
     public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO) {
